@@ -10,8 +10,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.wb.swt.SWTResourceManager;
 
-import pl.korczynskij.metroswt.MenuBarItem;
-
 public class MenuBar extends Composite {
 	protected Menu menu;
 	private ArrayList<MenuBarItem> menus = new ArrayList<>();
@@ -36,7 +34,7 @@ public class MenuBar extends Composite {
 		}
 		menus.clear();
 		for (MenuItem menuItem : menu.getItems()) {
-			menus.add(new MenuBarItem(this, menuItem.getText(), menuItem.getMenu()));
+			menus.add(new MenuBarItem(this, menuItem.getText(), menuItem));
 		}
 		super.layout(true);
 	}

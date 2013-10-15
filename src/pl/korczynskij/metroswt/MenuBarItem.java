@@ -7,6 +7,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -16,21 +17,38 @@ public class MenuBarItem extends CustomCanvas {
 	private Menu menu;
 	private String text;
 
-	public MenuBarItem(MenuBar menuBar, String text, Menu menu) {
+	public MenuBarItem(MenuBar menuBar, String text, MenuItem menuItem) {
 		super(menuBar, 0);
-		this.menu = menu;
 		this.text = text;
+		setMenu(menuItem);
 		setCursor(SWTResourceManager.getCursor(SWT.CURSOR_ARROW));
 		initGUI();
-
+	
 	}
 	
+	public void setMenu(MenuItem menuItem) {
+		this.menu = menuItem.getMenu();
+		//Not sure if it is the best way to handle SWT.Selection.
+		for (final Listener listener : menuItem.getListeners(SWT.Selection)) {
+			this.addListener(SWT.MouseDown, new Listener() {
+				
+				@Override
+				public void handleEvent(Event arg0) {
+					arg0.type=SWT.Selection;
+					listener.handleEvent(arg0);
+					isMouseDown=false;
+				}
+			});
+		}
+	}
+
 	@Override
 	public MenuBar getParent() {
 		return (MenuBar)super.getParent();
 	}
 
 	private void initGUI() {
+		
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent arg0) {
@@ -43,6 +61,7 @@ public class MenuBarItem extends CustomCanvas {
 			}
 		});
 	}
+
 
 	@Override
 	public Point computeSize(int wHint, int hHint, boolean changed) {
@@ -86,7 +105,7 @@ public class MenuBarItem extends CustomCanvas {
 			
 			m.setText(menuItem.getText());
 			for (Listener listener : menuItem.getListeners(SWT.Selection)) {
-				m.addListener(SWT.Selection, listener);
+				menu.addListener(SWT.Selection, listener);
 			}
 			for (Listener listener : menuItem.getListeners(SWT.Arm)) {
 				m.addListener(SWT.Arm, listener);
@@ -108,7 +127,7 @@ public class MenuBarItem extends CustomCanvas {
 			menu.setLocation(toDisplay(0, getSize().y));
 			menu.setVisible(true);
 	
-
+			
 			while (!menu.isDisposed() && menu.isVisible()) {
 		          if (!getDisplay().readAndDispatch())
 		            getDisplay().sleep();
