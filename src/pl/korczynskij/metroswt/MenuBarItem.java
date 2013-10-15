@@ -28,7 +28,6 @@ public class MenuBarItem extends CustomCanvas {
 	
 	public void setMenu(MenuItem menuItem) {
 		this.menu = menuItem.getMenu();
-	
 		//Not sure if it is the best way to handle SWT.Selection.
 		for (final Listener listener : menuItem.getListeners(SWT.Selection)) {
 			this.addListener(SWT.MouseDown, new Listener() {

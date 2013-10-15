@@ -54,6 +54,11 @@ public class MetroShell extends Shell {
 	ArrayList<Shadow> shadowsLeft = new ArrayList<>();
 	ArrayList<Shadow> shadowsRight = new ArrayList<>();
 	ArrayList<Shadow> shadowsTop = new ArrayList<>();
+	protected boolean isActive;
+
+	public boolean isWindowActive() {
+		return isActive;
+	}
 
 	public MetroShell() {
 		super(SWT.NO_TRIM | SWT.DOUBLE_BUFFERED);
@@ -180,7 +185,7 @@ public class MetroShell extends Shell {
 
 	protected void cmpTitleBar_mouseUp(MouseEvent arg0) {
 		isWindowMoving = false;
-		SetShadowsAlpha(10);
+		SetShadowsAlpha(30);
 		UpdateShadowsPositon(getLocation().x, getLocation().y);
 		cmpTitleBar.setCursor(new Cursor(getDisplay(), SWT.CURSOR_ARROW));
 		if (MouseInfo.getPointerInfo().getLocation().y < 10) {
@@ -644,7 +649,10 @@ public class MetroShell extends Shell {
 		gc.setBackground(getForeground());
 		gc.drawRectangle(getSize().x - 10, getSize().y - 10, 5, 5);
 		if (getBorderColor() != null) {
-			gc.setForeground(getBorderColor());
+			if (isWindowActive())
+				gc.setForeground(getBorderColor());
+			else
+				gc.setForeground(SWTResourceManager.getColor(128,128,128));
 			gc.drawRectangle(0, 0, getSize().x - 1, getSize().y - 1);
 		}
 		if (isDrawStatusBar()) {
@@ -655,12 +663,16 @@ public class MetroShell extends Shell {
 	}
 
 	protected void this_shellActivated(ShellEvent arg0) {
+		isActive=true;
 		ToggleShadow(true);
 		UpdateShadowsPositon(getLocation().x, getLocation().y);
+		redraw();
 	}
 
 	protected void this_shellDeactivated(ShellEvent arg0) {
+		isActive=false;
 		ToggleShadow(false);
+		redraw();
 	}
 
 	protected void this_ShellDeiconified(ShellEvent arg0) {
@@ -858,7 +870,7 @@ public class MetroShell extends Shell {
 
 	@Override
 	public void setSize(int width, int height) {
-		setSize(width, height, false);
+		setSize(width, height, true);
 	}
 
 	@Override
